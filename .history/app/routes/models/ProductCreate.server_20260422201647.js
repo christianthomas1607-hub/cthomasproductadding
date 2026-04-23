@@ -1,0 +1,2 @@
+import { authenticate } from "../shopify.server";
+
