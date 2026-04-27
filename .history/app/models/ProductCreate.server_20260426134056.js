@@ -1,10 +1,8 @@
-import { authenticate } from "../shopify.server";
-
-
+// import { authenticate } from "../shopify.server";
 
 export async function productCreateAction({ request }) {
   const { admin } = await authenticate.admin(request);
-  const color = ["Redmodel", "Orangemodel", "Yellowmodel", "Greendmodel"][
+  const color = ["Reddd", "Orangeddd", "Yellowddd", "Greendd"][
     Math.floor(Math.random() * 4)
   ];
   const response = await admin.graphql(

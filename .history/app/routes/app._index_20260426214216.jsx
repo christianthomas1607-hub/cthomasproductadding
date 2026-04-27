@@ -38,8 +38,11 @@ export default function Index() {
 
 
 //   fetcher lets you submit forms without leaving the page.
+
 // It’s like fetch() but built into React Router.
+
 // It gives you:
+
 // fetcher.submit() → send data to your action
 // fetcher.state → "idle" | "submitting" | "loading"
 // fetcher.data → response from the server
@@ -53,21 +56,12 @@ export default function Index() {
     ["loading", "submitting"].includes(fetcher.state) &&
     fetcher.formMethod === "POST";
 
-//     Runs every time fetcher.data.product.id changes.
-
-// If a new product was created, show a Shopify toast.
-
-// This only triggers after the server returns data.
   useEffect(() => {
     if (fetcher.data?.product?.id) {
       shopify.toast.show("Product created");
     }
   }, [fetcher.data?.product?.id, shopify]);
 
-
-//   Sends an empty POST request.
-
-// Since no file is included, your action runs productCreateAction.
   const generateProduct = () => fetcher.submit({}, { method: "POST" });
 
   return (
@@ -76,30 +70,6 @@ export default function Index() {
         Generate a product
       </s-button>
 
-
-
-
-
-{/* method="post"
-Tells the browser this form should send a POST request.
-
-encType="multipart/form-data"
-Required for file uploads.
-
-Without this, the file won’t be included.
-
-onSubmit={(e) => { ... }}
-We override the default browser form submission.
-
-e.preventDefault() stops the browser from doing a full page reload.
-
-new FormData(e.currentTarget)
-Extracts all fields (including the file) into a FormData object.
-
-fetcher.submit(formData, { method: "post" })
-Sends the form to your server without leaving the page.
-
-This keeps App Bridge alive and avoids the “useContext is null” error. */}
       <form
         method="post"
         encType="multipart/form-data"
@@ -112,10 +82,6 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
           });
         }}
       >
-
-
-        {/* Lets the user pick an Excel file.
-        The name="file" must match formData.get("file"). */}
         <input type="file" name="file" accept=".xlsx,.xls" />
         <s-button type="submit">Upload Excel & Create Products</s-button>
       </form>

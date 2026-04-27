@@ -112,10 +112,6 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
           });
         }}
       >
-
-
-        {/* Lets the user pick an Excel file.
-        The name="file" must match formData.get("file"). */}
         <input type="file" name="file" accept=".xlsx,.xls" />
         <s-button type="submit">Upload Excel & Create Products</s-button>
       </form>

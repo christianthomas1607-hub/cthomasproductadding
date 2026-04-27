@@ -1,12 +1,15 @@
 import { authenticate } from "../shopify.server";
+import XLSX from "xlsx";
 
 
-
-export async function productCreateAction({ request }) {
+export async function excelProductCreateAction({ request }) {
   const { admin } = await authenticate.admin(request);
   const color = ["Redmodel", "Orangemodel", "Yellowmodel", "Greendmodel"][
     Math.floor(Math.random() * 4)
   ];
+
+
+  
   const response = await admin.graphql(
     `#graphql
       mutation populateProduct($product: ProductCreateInput!) {

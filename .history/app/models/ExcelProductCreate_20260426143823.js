@@ -1,12 +1,35 @@
 import { authenticate } from "../shopify.server";
+import XLSX from "xlsx";
 
 
-
-export async function productCreateAction({ request }) {
+export async function excelProductCreateAction({ request }) {
   const { admin } = await authenticate.admin(request);
   const color = ["Redmodel", "Orangemodel", "Yellowmodel", "Greendmodel"][
     Math.floor(Math.random() * 4)
   ];
+
+  const formData = await request.formData();
+  const file = formData.get("file");
+
+  if (!file) {
+    return { error: "No file uploaded" };
+  }
+
+  // Convert file to buffer
+  const buffer = await file.arrayBuffer();
+
+  // Parse Excel
+  const workbook = XLSX.read(buffer, { type: "buffer" });
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet);
+
+  // rows is now an array of objects like:
+  // [{ title: "Product A", price: 10, barcode: "123" }, ...]
+
+  const createdProducts = [];
+
+  for (const row of rows) {
+
   const response = await admin.graphql(
     `#graphql
       mutation populateProduct($product: ProductCreateInput!) {
@@ -35,7 +58,7 @@ export async function productCreateAction({ request }) {
     {
       variables: {
         product: {
-          title: `${color} Snowboard`,
+          title: `${row.} Snowboard`,
           metafields: [
             {
               namespace: "$app",
@@ -116,4 +139,6 @@ export async function productCreateAction({ request }) {
     variant: variantResponseJson.data.productVariantsBulkUpdate.productVariants,
     metaobject: metaobjectResponseJson.data.metaobjectUpsert.metaobject,
   };
+
+}
 }

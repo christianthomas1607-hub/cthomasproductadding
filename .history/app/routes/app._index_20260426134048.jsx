@@ -3,10 +3,7 @@ import { useFetcher } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
-import { productCreateAction } from "../models/ProductCreate.server.js";
-import { excelProductCreateAction } from "../models/ExcelProductCreate.server";
-
-
+// import { productCreateAction } from "../models/ProductCreate.server.js";
 
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
@@ -14,60 +11,133 @@ export const loader = async ({ request }) => {
 };
 
 export const action = async ({ request }) => {
+  const { admin } = await authenticate.admin(request);
+  const color = ["Reddd", "Orangeddd", "Yellowddd", "Greendd"][
+    Math.floor(Math.random() * 4)
+  ];
+  const response = await admin.graphql(
+    `#graphql
+      mutation populateProduct($product: ProductCreateInput!) {
+        productCreate(product: $product) {
+          product {
+            id
+            title
+            handle
+            status
+            variants(first: 10) {
+              edges {
+                node {
+                  id
+                  price
+                  barcode
+                  createdAt
+                }
+              }
+            }
+            demoInfo: metafield(namespace: "$app", key: "demo_info") {
+              jsonValue
+            }
+          }
+        }
+      }`,
+    {
+      variables: {
+        product: {
+          title: `${color} Snowboard`,
+          metafields: [
+            {
+              namespace: "$app",
+              key: "demo_info",
+              value: "Created by React Router Template",
+            },
+          ],
+        },
+      },
+    },
+  );
+  const responseJson = await response.json();
+  const product = responseJson.data.productCreate.product;
+  const variantId = product.variants.edges[0].node.id;
+  const variantResponse = await admin.graphql(
+    `#graphql
+    mutation shopifyReactRouterTemplateUpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
+      productVariantsBulkUpdate(productId: $productId, variants: $variants) {
+        productVariants {
+          id
+          price
+          barcode
+          createdAt
+        }
+      }
+    }`,
+    {
+      variables: {
+        productId: product.id,
+        variants: [{ id: variantId, price: "100.00" }],
+      },
+    },
+  );
+  const variantResponseJson = await variantResponse.json();
+  const metaobjectResponse = await admin.graphql(
+    `#graphql
+    mutation shopifyReactRouterTemplateUpsertMetaobject($handle: MetaobjectHandleInput!, $metaobject: MetaobjectUpsertInput!) {
+      metaobjectUpsert(handle: $handle, metaobject: $metaobject) {
+        metaobject {
+          id
+          handle
+          title: field(key: "title") {
+            jsonValue
+          }
+          description: field(key: "description") {
+            jsonValue
+          }
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+    {
+      variables: {
+        handle: {
+          type: "$app:example",
+          handle: "demo-entry",
+        },
+        metaobject: {
+          fields: [
+            { key: "title", value: "Demo Entry" },
+            {
+              key: "description",
+              value:
+                "This metaobject was created by the Shopify app template to demonstrate the metaobject API.",
+            },
+          ],
+        },
+      },
+    },
+  );
+  const metaobjectResponseJson = await metaobjectResponse.json();
 
-
-  //   request is the HTTP POST request sent from your form.
-  // formData() reads the body once and turns it into a FormData object.
-  // This is where all your form fields live (including the uploaded file).
-  const formData = await request.formData();
-
-
-  //   Looks for <input name="file"> in the form.
-  // If the user selected a file, file is a Blob (browser file object).
-  // If they didn’t, file is null.
-  const file = formData.get("file");
-
-  if (file) {
-    return excelProductCreateAction({ request, formData });
-  }
-
-  return productCreateAction({ request });
+  return {
+    product: responseJson.data.productCreate.product,
+    variant: variantResponseJson.data.productVariantsBulkUpdate.productVariants,
+    metaobject: metaobjectResponseJson.data.metaobjectUpsert.metaobject,
+  };
 };
 
 export default function Index() {
-
-
-//   fetcher lets you submit forms without leaving the page.
-// It’s like fetch() but built into React Router.
-// It gives you:
-// fetcher.submit() → send data to your action
-// fetcher.state → "idle" | "submitting" | "loading"
-// fetcher.data → response from the server
   const fetcher = useFetcher();
-
-//   Gives you access to Shopify’s UI features (toasts, modals, navigation).
-// Only works if your component is inside <AppBridgeProvider>.
   const shopify = useAppBridge();
-
   const isLoading =
     ["loading", "submitting"].includes(fetcher.state) &&
     fetcher.formMethod === "POST";
 
-//     Runs every time fetcher.data.product.id changes.
-
-// If a new product was created, show a Shopify toast.
-
-// This only triggers after the server returns data.
   useEffect(() => {
     if (fetcher.data?.product?.id) {
       shopify.toast.show("Product created");
     }
   }, [fetcher.data?.product?.id, shopify]);
-
-
-//   Sends an empty POST request.
-
-// Since no file is included, your action runs productCreateAction.
   const generateProduct = () => fetcher.submit({}, { method: "POST" });
 
   return (
@@ -75,50 +145,6 @@ export default function Index() {
       <s-button slot="primary-action" onClick={generateProduct}>
         Generate a product
       </s-button>
-
-
-
-
-
-{/* method="post"
-Tells the browser this form should send a POST request.
-
-encType="multipart/form-data"
-Required for file uploads.
-
-Without this, the file won’t be included.
-
-onSubmit={(e) => { ... }}
-We override the default browser form submission.
-
-e.preventDefault() stops the browser from doing a full page reload.
-
-new FormData(e.currentTarget)
-Extracts all fields (including the file) into a FormData object.
-
-fetcher.submit(formData, { method: "post" })
-Sends the form to your server without leaving the page.
-
-This keeps App Bridge alive and avoids the “useContext is null” error. */}
-      <form
-        method="post"
-        encType="multipart/form-data"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-          fetcher.submit(formData, {
-            method: "post",
-            encType: "multipart/form-data",
-          });
-        }}
-      >
-
-
-        {/* Lets the user pick an Excel file.
-        The name="file" must match formData.get("file"). */}
-        <input type="file" name="file" accept=".xlsx,.xls" />
-        <s-button type="submit">Upload Excel & Create Products</s-button>
-      </form>
 
       <s-section heading="Congrats on creating a new Shopify app 🎉">
         <s-paragraph>

@@ -78,9 +78,9 @@ export default function Index() {
 
 
 
+Let’s break this down:
 
-
-{/* method="post"
+method="post"
 Tells the browser this form should send a POST request.
 
 encType="multipart/form-data"
@@ -99,7 +99,7 @@ Extracts all fields (including the file) into a FormData object.
 fetcher.submit(formData, { method: "post" })
 Sends the form to your server without leaving the page.
 
-This keeps App Bridge alive and avoids the “useContext is null” error. */}
+This keeps App Bridge alive and avoids the “useContext is null” error.
       <form
         method="post"
         encType="multipart/form-data"
@@ -112,10 +112,6 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
           });
         }}
       >
-
-
-        {/* Lets the user pick an Excel file.
-        The name="file" must match formData.get("file"). */}
         <input type="file" name="file" accept=".xlsx,.xls" />
         <s-button type="submit">Upload Excel & Create Products</s-button>
       </form>

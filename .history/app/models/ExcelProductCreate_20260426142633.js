@@ -2,7 +2,7 @@ import { authenticate } from "../shopify.server";
 
 
 
-export async function productCreateAction({ request }) {
+export async function exelProductCreateAction({ request }) {
   const { admin } = await authenticate.admin(request);
   const color = ["Redmodel", "Orangemodel", "Yellowmodel", "Greendmodel"][
     Math.floor(Math.random() * 4)
