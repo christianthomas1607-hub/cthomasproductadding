@@ -6,16 +6,21 @@ import { authenticate } from "../shopify.server";
 import { productCreateAction } from "../models/ProductCreate.server.js";
 import { excelProductCreateAction } from "../models/ExcelProductCreate.server";
 
+
+
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
   return null;
 };
 
 export const action = async ({ request }) => {
+
+
   //   request is the HTTP POST request sent from your form.
   // formData() reads the body once and turns it into a FormData object.
   // This is where all your form fields live (including the uploaded file).
   const formData = await request.formData();
+
 
   //   Looks for <input name="file"> in the form.
   // If the user selected a file, file is a Blob (browser file object).
@@ -30,34 +35,38 @@ export const action = async ({ request }) => {
 };
 
 export default function Index() {
-  //   fetcher lets you submit forms without leaving the page.
-  // It’s like fetch() but built into React Router.
-  // It gives you:
-  // fetcher.submit() → send data to your action
-  // fetcher.state → "idle" | "submitting" | "loading"
-  // fetcher.data → response from the server
+
+
+//   fetcher lets you submit forms without leaving the page.
+// It’s like fetch() but built into React Router.
+// It gives you:
+// fetcher.submit() → send data to your action
+// fetcher.state → "idle" | "submitting" | "loading"
+// fetcher.data → response from the server
   const fetcher = useFetcher();
 
-  //   Gives you access to Shopify’s UI features (toasts, modals, navigation).
-  // Only works if your component is inside <AppBridgeProvider>.
+//   Gives you access to Shopify’s UI features (toasts, modals, navigation).
+// Only works if your component is inside <AppBridgeProvider>.
   const shopify = useAppBridge();
 
   const isLoading =
     ["loading", "submitting"].includes(fetcher.state) &&
     fetcher.formMethod === "POST";
 
-  // Runs every time fetcher.data.product.id changes.
-  // If a new product was created, show a Shopify toast.
-  // This only triggers after the server returns data.
+//     Runs every time fetcher.data.product.id changes.
+// If a new product was created, show a Shopify toast.
+
+// This only triggers after the server returns data.
   useEffect(() => {
     if (fetcher.data?.product?.id) {
       shopify.toast.show("Product created");
     }
   }, [fetcher.data?.product?.id, shopify]);
 
-  //   Sends an empty POST request.
 
-  // Since no file is included, your action runs productCreateAction.
+//   Sends an empty POST request.
+
+// Since no file is included, your action runs productCreateAction.
   const generateProduct = () => fetcher.submit({}, { method: "POST" });
 
   return (
@@ -66,7 +75,11 @@ export default function Index() {
         Generate a product
       </s-button>
 
-      {/* method="post"
+
+
+
+
+{/* method="post"
 Tells the browser this form should send a POST request.
 
 encType="multipart/form-data"
@@ -98,6 +111,8 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
           });
         }}
       >
+
+
         {/* Lets the user pick an Excel file.
         The name="file" must match formData.get("file"). */}
         <input type="file" name="file" accept=".xlsx,.xls" />

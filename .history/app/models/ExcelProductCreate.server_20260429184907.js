@@ -79,33 +79,10 @@ export async function excelProductCreateAction({ request, formData }) {
       },
     );
 
-    const responseJson = await response.json();
-    const product = responseJson.data.productCreate.product;
-    const variantId = product.variants.edges[0].node.id;
-
-    const variantResponse = await admin.graphql(
-      `#graphql
-    mutation shopifyReactRouterTemplateUpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-      productVariantsBulkUpdate(productId: $productId, variants: $variants) {
-        productVariants {
-          id
-          price
-          barcode
-          createdAt
-        }
-      }
-    }`,
-      {
-        variables: {
-          productId: product.id,
-          variants: [{ id: variantId, price: "100.00" }],
-        },
-      },
-    );
-
-    await variantResponse.json();
-
-    createdProducts.push(responseJson.data.productCreate.product);
+    const json = await response.json();
+      const product = responseJson.data.productCreate.product;
+  const variantId = product.variants.edges[0].node.id;
+    createdProducts.push(json.data.productCreate.product);
   }
   return { products: createdProducts };
 }

@@ -84,7 +84,7 @@ export async function excelProductCreateAction({ request, formData }) {
     const variantId = product.variants.edges[0].node.id;
 
     const variantResponse = await admin.graphql(
-      `#graphql
+    `#graphql
     mutation shopifyReactRouterTemplateUpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
       productVariantsBulkUpdate(productId: $productId, variants: $variants) {
         productVariants {
@@ -95,15 +95,15 @@ export async function excelProductCreateAction({ request, formData }) {
         }
       }
     }`,
-      {
-        variables: {
-          productId: product.id,
-          variants: [{ id: variantId, price: "100.00" }],
-        },
+    {
+      variables: {
+        productId: product.id,
+        variants: [{ id: variantId, price: "100.00" }],
       },
-    );
+    },
+  );
 
-    await variantResponse.json();
+  const variantResponseJson = await variantResponse.json();
 
     createdProducts.push(responseJson.data.productCreate.product);
   }
