@@ -1,10 +1,6 @@
 import { authenticate } from "../shopify.server";
 import { excelReader } from "../excel-reader/ExcelReader";
-import {
-  itemNameTransform,
-  colorsTransform,
-  sizesTransform,
-} from "../utilities/transformers/transformer";
+import { itemNameTransform, colorsTransform, sizesTransform } from "../utilities/transformers/transformer";
 
 export async function excelProductCreateAction({ request, formData }) {
   const { admin } = await authenticate.admin(request);
@@ -30,8 +26,9 @@ export async function excelProductCreateAction({ request, formData }) {
     console.log(itemName);
 
     const colorsTransformedArray = await colorsTransform(row.Color);
-
+    
     const sizesTransformedArray = await sizesTransform(row.Sizes);
+  
 
     const colorsValuesArray = [];
 
@@ -48,7 +45,7 @@ export async function excelProductCreateAction({ request, formData }) {
         name: size,
       });
     }
-    //What they both look like:
+    //What it looks like
     //values: [{ name: "Red" }, { name: "Green" }, { name: "Blue" }],
 
     const response = await admin.graphql(
@@ -99,6 +96,19 @@ export async function excelProductCreateAction({ request, formData }) {
                 name: "Size",
                 values: sizeValuesArray,
               },
+              // ,
+              // {
+              //   name: "Color",
+              //   values: [{ name: "Red" }, { name: "Green" }, { name: "Blue" }],
+              // },
+              // {
+              //   name: "Size",
+              //   values: [
+              //     { name: "Small" },
+              //     { name: "Medium" },
+              //     { name: "Large" },
+              //   ],
+              // },
             ],
           },
         },
@@ -108,12 +118,13 @@ export async function excelProductCreateAction({ request, formData }) {
     const responseJson = await response.json();
     const product = responseJson.data.productCreate.product;
 
+
     const variantsArray = [];
 
     for (const color of colorsTransformedArray) {
       for (const size of sizesTransformedArray) {
         variantsArray.push({
-          price: 0.0,
+          price: 4.99,
           optionValues: [
             { optionName: "Color", name: color },
             { optionName: "Size", name: size },
@@ -121,30 +132,6 @@ export async function excelProductCreateAction({ request, formData }) {
         });
       }
     }
-    //What it looks like:
-    // variants: [
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Small", optionName: "Size" },
-    //   ],
-    // },
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Medium", optionName: "Size" },
-    //   ],
-    // },
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Large", optionName: "Size" },
-    //   ],
-    // }
-    // ],
 
     const responseOptions = await admin.graphql(
       `#graphql
@@ -168,6 +155,29 @@ export async function excelProductCreateAction({ request, formData }) {
         variables: {
           productId: product.id,
           variants: variantsArray,
+          // variants: [
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Small", optionName: "Size" },
+          //   ],
+          // },
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Medium", optionName: "Size" },
+          //   ],
+          // },
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Large", optionName: "Size" },
+          //   ],
+          // }
+          // ],
         },
       },
     );

@@ -26,8 +26,10 @@ export async function excelProductCreateAction({ request, formData }) {
 
   for (const row of rows) {
     const itemName = await itemNameTransform(row.Item);
-
     console.log(itemName);
+
+    const itemSku = await itemNameTransform(row.SKU);
+    console.log(sku);
 
     const colorsTransformedArray = await colorsTransform(row.Color);
 
@@ -114,6 +116,7 @@ export async function excelProductCreateAction({ request, formData }) {
       for (const size of sizesTransformedArray) {
         variantsArray.push({
           price: 0.0,
+          sku: sku,
           optionValues: [
             { optionName: "Color", name: color },
             { optionName: "Size", name: size },

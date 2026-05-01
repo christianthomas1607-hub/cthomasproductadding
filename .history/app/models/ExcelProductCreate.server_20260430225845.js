@@ -1,10 +1,6 @@
 import { authenticate } from "../shopify.server";
 import { excelReader } from "../excel-reader/ExcelReader";
-import {
-  itemNameTransform,
-  colorsTransform,
-  sizesTransform,
-} from "../utilities/transformers/transformer";
+import { stringTransform, itemNameTransform,  } from "../utilities/transformers/transformer";
 
 export async function excelProductCreateAction({ request, formData }) {
   const { admin } = await authenticate.admin(request);
@@ -25,13 +21,56 @@ export async function excelProductCreateAction({ request, formData }) {
   const createdProducts = [];
 
   for (const row of rows) {
-    const itemName = await itemNameTransform(row.Item);
+    const itemName = await stringTransform(row.Item);
 
     console.log(itemName);
 
-    const colorsTransformedArray = await colorsTransform(row.Color);
+    /* console.log(row.Color); */
 
-    const sizesTransformedArray = await sizesTransform(row.Sizes);
+    const colorsArray = row.Color.split(/\r?\n/);
+
+    const colorsTransformedArray = [];
+
+    for (const color of colorsArray) {
+      const colorTransformed = await stringTransform(color);
+
+      colorsTransformedArray.push(colorTransformed);
+      console.log(`__Color:___${colorTransformed}__`);
+    }
+
+    const sizeMinMaxRange = row.Sizes;
+
+    const sizes = [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "2XL",
+      "3XL",
+      "4XL",
+      "5XL",
+      "6XL",
+    ];
+
+    // 1. Split the range into min and max
+    const [minSize, maxSize] = sizeMinMaxRange.split("-");
+
+    // 2. Find their indexes in the sizes array
+    const startIndex = sizes.indexOf(minSize.trim());
+    const endIndex = sizes.indexOf(maxSize.trim());
+
+    // 3. Loop through the range
+    for (let i = startIndex; i <= endIndex; i++) {
+      console.log(sizes[i]);
+    }
+
+    for (const color of colorsTransformedArray) {
+      for (let i = startIndex; i <= endIndex; i++) {
+        console.log(color);
+        console.log(sizes[i]);
+      }
+    }
 
     const colorsValuesArray = [];
 
@@ -43,12 +82,12 @@ export async function excelProductCreateAction({ request, formData }) {
 
     const sizeValuesArray = [];
 
-    for (const size of sizesTransformedArray) {
+    for (let i = startIndex; i <= endIndex; i++) {
       sizeValuesArray.push({
-        name: size,
+        name: sizes[i],
       });
     }
-    //What they both look like:
+
     //values: [{ name: "Red" }, { name: "Green" }, { name: "Blue" }],
 
     const response = await admin.graphql(
@@ -99,6 +138,19 @@ export async function excelProductCreateAction({ request, formData }) {
                 name: "Size",
                 values: sizeValuesArray,
               },
+              // ,
+              // {
+              //   name: "Color",
+              //   values: [{ name: "Red" }, { name: "Green" }, { name: "Blue" }],
+              // },
+              // {
+              //   name: "Size",
+              //   values: [
+              //     { name: "Small" },
+              //     { name: "Medium" },
+              //     { name: "Large" },
+              //   ],
+              // },
             ],
           },
         },
@@ -111,40 +163,16 @@ export async function excelProductCreateAction({ request, formData }) {
     const variantsArray = [];
 
     for (const color of colorsTransformedArray) {
-      for (const size of sizesTransformedArray) {
+      for (let i = startIndex; i <= endIndex; i++) {
         variantsArray.push({
-          price: 0.0,
+          price: 4.99,
           optionValues: [
             { optionName: "Color", name: color },
-            { optionName: "Size", name: size },
+            { optionName: "Size", name: sizes[i] },
           ],
         });
       }
     }
-    //What it looks like:
-    // variants: [
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Small", optionName: "Size" },
-    //   ],
-    // },
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Medium", optionName: "Size" },
-    //   ],
-    // },
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Large", optionName: "Size" },
-    //   ],
-    // }
-    // ],
 
     const responseOptions = await admin.graphql(
       `#graphql
@@ -168,6 +196,29 @@ export async function excelProductCreateAction({ request, formData }) {
         variables: {
           productId: product.id,
           variants: variantsArray,
+          // variants: [
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Small", optionName: "Size" },
+          //   ],
+          // },
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Medium", optionName: "Size" },
+          //   ],
+          // },
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Large", optionName: "Size" },
+          //   ],
+          // }
+          // ],
         },
       },
     );
@@ -177,4 +228,17 @@ export async function excelProductCreateAction({ request, formData }) {
     createdProducts.push(responseJson.data.productCreate.product);
   }
   return { products: createdProducts };
+}
+
+//For making a string trimmed, titlecased
+async function stringTransform(str) {
+  return str
+    .trim()
+    .replace("  ", "")
+    .replace(/\n/g, "") //Removes newline
+    .replace(/[^a-zA-Z0-9 ]/g, "") //This strips punctuation, symbols, emojis—everything except letters and numbers:
+    .toLowerCase()
+    .split(" ") //Splits to array on a space
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) //Make first char uppercase and add chars that are after first char to the end of the first char.
+    .join(" "); //Join each word back to being a full string again with space separating each word.
 }

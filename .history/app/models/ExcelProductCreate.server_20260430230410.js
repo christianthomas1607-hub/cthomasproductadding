@@ -113,7 +113,7 @@ export async function excelProductCreateAction({ request, formData }) {
     for (const color of colorsTransformedArray) {
       for (const size of sizesTransformedArray) {
         variantsArray.push({
-          price: 0.0,
+          price: 4.99,
           optionValues: [
             { optionName: "Color", name: color },
             { optionName: "Size", name: size },
@@ -123,28 +123,28 @@ export async function excelProductCreateAction({ request, formData }) {
     }
     //What it looks like:
     // variants: [
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Small", optionName: "Size" },
-    //   ],
-    // },
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Medium", optionName: "Size" },
-    //   ],
-    // },
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Large", optionName: "Size" },
-    //   ],
-    // }
-    // ],
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Small", optionName: "Size" },
+          //   ],
+          // },
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Medium", optionName: "Size" },
+          //   ],
+          // },
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Large", optionName: "Size" },
+          //   ],
+          // }
+          // ],
 
     const responseOptions = await admin.graphql(
       `#graphql
@@ -168,6 +168,29 @@ export async function excelProductCreateAction({ request, formData }) {
         variables: {
           productId: product.id,
           variants: variantsArray,
+          // variants: [
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Small", optionName: "Size" },
+          //   ],
+          // },
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Medium", optionName: "Size" },
+          //   ],
+          // },
+          // {
+          //   price: 4.99,
+          //   optionValues: [
+          //     { name: "Red", optionName: "Color" },
+          //     { name: "Large", optionName: "Size" },
+          //   ],
+          // }
+          // ],
         },
       },
     );

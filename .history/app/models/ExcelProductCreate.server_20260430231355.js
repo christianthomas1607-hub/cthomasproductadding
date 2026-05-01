@@ -114,6 +114,7 @@ export async function excelProductCreateAction({ request, formData }) {
       for (const size of sizesTransformedArray) {
         variantsArray.push({
           price: 0.0,
+          
           optionValues: [
             { optionName: "Color", name: color },
             { optionName: "Size", name: size },
