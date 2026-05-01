@@ -118,9 +118,6 @@ export async function excelProductCreateAction({ request, formData }) {
             { optionName: "Color", name: color },
             { optionName: "Size", name: size },
           ],
-          inventoryItem: {
-            sku: row.SKU,
-          },
         });
       }
     }
@@ -139,7 +136,6 @@ export async function excelProductCreateAction({ request, formData }) {
     //     { name: "Medium", optionName: "Size" },
     //   ],
     // }
-
     const responseOptions = await admin.graphql(
       `#graphql
   mutation ProductVariantsCreate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {

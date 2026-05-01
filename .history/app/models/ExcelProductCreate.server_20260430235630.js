@@ -118,9 +118,9 @@ export async function excelProductCreateAction({ request, formData }) {
             { optionName: "Color", name: color },
             { optionName: "Size", name: size },
           ],
-          inventoryItem: {
-            sku: row.SKU,
-          },
+      inventoryItem: {
+        sku: `${color}-${size}`.toUpperCase().replace(" ", "-")
+      }
         });
       }
     }

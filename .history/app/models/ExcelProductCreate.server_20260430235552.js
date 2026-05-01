@@ -118,13 +118,11 @@ export async function excelProductCreateAction({ request, formData }) {
             { optionName: "Color", name: color },
             { optionName: "Size", name: size },
           ],
-          inventoryItem: {
-            sku: row.SKU,
-          },
         });
       }
     }
     //What it looks like:
+
     // {
     //   price: 4.99,
     //   optionValues: [
@@ -138,7 +136,15 @@ export async function excelProductCreateAction({ request, formData }) {
     //     { name: "Red", optionName: "Color" },
     //     { name: "Medium", optionName: "Size" },
     //   ],
+    // },
+    // {
+    //   price: 4.99,
+    //   optionValues: [
+    //     { name: "Red", optionName: "Color" },
+    //     { name: "Large", optionName: "Size" },
+    //   ],
     // }
+    // ],
 
     const responseOptions = await admin.graphql(
       `#graphql
