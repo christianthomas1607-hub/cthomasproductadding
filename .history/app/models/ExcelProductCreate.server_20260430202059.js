@@ -56,16 +56,6 @@ export async function excelProductCreateAction({ request, formData }) {
             hasVariants
           }
         }
-
-        variants(first: 240) {
-        edges {
-          node {
-            id
-            title
-            price
-          }
-        }
-      }
       }
       userErrors {
         field
@@ -78,18 +68,8 @@ export async function excelProductCreateAction({ request, formData }) {
           product: {
             title: `${row.title}`,
             productOptions: [
-              {
-                name: "Color",
-                values: [{ name: "Red" }, { name: "Green" }, { name: "Blue" }],
-              },
-              {
-                name: "Size",
-                values: [
-                  { name: "Small" },
-                  { name: "Medium" },
-                  { name: "Large" },
-                ],
-              },
+              { name: "Color", values: [{ name: "Red" }, { name: "Blue" }] },
+              { name: "Size", values: [{ name: "Small" }, { name: "Large" }] },
             ],
           },
         },

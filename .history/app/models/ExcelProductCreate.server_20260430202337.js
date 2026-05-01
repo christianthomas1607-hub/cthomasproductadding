@@ -57,15 +57,7 @@ export async function excelProductCreateAction({ request, formData }) {
           }
         }
 
-        variants(first: 240) {
-        edges {
-          node {
-            id
-            title
-            price
-          }
-        }
-      }
+        
       }
       userErrors {
         field

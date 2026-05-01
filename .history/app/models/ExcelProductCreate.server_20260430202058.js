@@ -56,16 +56,6 @@ export async function excelProductCreateAction({ request, formData }) {
             hasVariants
           }
         }
-
-        variants(first: 240) {
-        edges {
-          node {
-            id
-            title
-            price
-          }
-        }
-      }
       }
       userErrors {
         field
@@ -78,18 +68,8 @@ export async function excelProductCreateAction({ request, formData }) {
           product: {
             title: `${row.title}`,
             productOptions: [
-              {
-                name: "Color",
-                values: [{ name: "Red" }, { name: "Green" }, { name: "Blue" }],
-              },
-              {
-                name: "Size",
-                values: [
-                  { name: "Small" },
-                  { name: "Medium" },
-                  { name: "Large" },
-                ],
-              },
+              { name: "Color", values: [{ name: "Red" }, { name: "Blue" }] },
+              { name: "Size", values: [{ name: "Small" }, { name: "Large" }] },
             ],
           },
         },
@@ -121,70 +101,70 @@ export async function excelProductCreateAction({ request, formData }) {
         variables: {
           productId: product.id,
           variants: [
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Red", optionName: "Color" },
-                { name: "Small", optionName: "Size" },
-              ],
-            },
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Red", optionName: "Color" },
-                { name: "Medium", optionName: "Size" },
-              ],
-            },
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Red", optionName: "Color" },
-                { name: "Large", optionName: "Size" },
-              ],
-            },
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Green", optionName: "Color" },
-                { name: "Small", optionName: "Size" },
-              ],
-            },
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Green", optionName: "Color" },
-                { name: "Medium", optionName: "Size" },
-              ],
-            },
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Green", optionName: "Color" },
-                { name: "Large", optionName: "Size" },
-              ],
-            },
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Blue", optionName: "Color" },
-                { name: "Small", optionName: "Size" },
-              ],
-            },
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Blue", optionName: "Color" },
-                { name: "Medium", optionName: "Size" },
-              ],
-            },
-            {
-              price: 4.99,
-              optionValues: [
-                { name: "Blue", optionName: "Color" },
-                { name: "Large", optionName: "Size" },
-              ],
-            },
-          ],
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Red", optionName: "Color" },
+          { name: "Small", optionName: "Size" }
+        ]
+      },
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Red", optionName: "Color" },
+          { name: "Medium", optionName: "Size" }
+        ]
+      },
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Red", optionName: "Color" },
+          { name: "Large", optionName: "Size" }
+        ]
+      },
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Green", optionName: "Color" },
+          { name: "Small", optionName: "Size" }
+        ]
+      },
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Green", optionName: "Color" },
+          { name: "Medium", optionName: "Size" }
+        ]
+      },
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Green", optionName: "Color" },
+          { name: "Large", optionName: "Size" }
+        ]
+      },
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Blue", optionName: "Color" },
+          { name: "Small", optionName: "Size" }
+        ]
+      },
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Blue", optionName: "Color" },
+          { name: "Medium", optionName: "Size" }
+        ]
+      },
+      {
+        price: 4.99,
+        optionValues: [
+          { name: "Blue", optionName: "Color" },
+          { name: "Large", optionName: "Size" }
+        ]
+      }
+    ]
         },
       },
     );

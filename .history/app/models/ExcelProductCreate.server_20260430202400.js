@@ -57,7 +57,7 @@ export async function excelProductCreateAction({ request, formData }) {
           }
         }
 
-        variants(first: 240) {
+        variants(first: 2048) {
         edges {
           node {
             id
