@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { useFetcher } from "react-router";
-
+import { useAppBridge } from "@shopify/app-bridge-react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { productCreateAction } from "../models/ProductCreate.server.js";
@@ -36,6 +37,18 @@ export default function Index() {
   // fetcher.state → "idle" | "submitting" | "loading"
   // fetcher.data → response from the server
   const fetcher = useFetcher();
+
+  //   Gives you access to Shopify’s UI features (toasts, modals, navigation).
+  // Only works if your component is inside <AppBridgeProvider>.
+  const shopify = useAppBridge();
+
+  const isLoading =
+    ["loading", "submitting"].includes(fetcher.state) &&
+    fetcher.formMethod === "POST";
+
+
+
+ 
 
   return (
     <s-page heading="Shopify app template">
@@ -77,22 +90,25 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
         <s-button type="submit">Upload Excel & Create Products</s-button>
       </form>
 
-      {fetcher.data?.products && (
-        <s-section heading="productCreate mutation"  style={{ margin: 1 }}>
-          <s-stack direction="block" gap="base">
-            <s-box
-              padding="base"
-              borderWidth="base"
-              borderRadius="base"
-              background="subdued"
-            >
-              <pre style={{ margin: 0 }}>
-                <code>{JSON.stringify(fetcher.data.products, null, 2)}</code>
-              </pre>
-            </s-box>
-          </s-stack>
-        </s-section>
-      )}
+      <s-section>
+        {fetcher.data?.products && (
+          <s-section heading="productCreate mutation">
+            <s-stack direction="block" gap="base">
+              <s-box
+                padding="base"
+                borderWidth="base"
+                borderRadius="base"
+                background="subdued"
+              >
+                <pre style={{ margin: 0 }}>
+                  <code>{JSON.stringify(fetcher.data.products, null, 2)}</code>
+                </pre>
+              </s-box>
+
+            </s-stack>
+          </s-section>
+        )}
+      </s-section>
 
       <s-section slot="aside" heading="App template specs">
         <s-paragraph>
@@ -136,6 +152,28 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
         </s-paragraph>
       </s-section>
 
+      <s-section slot="aside" heading="Next steps">
+        <s-unordered-list>
+          <s-list-item>
+            Build an{" "}
+            <s-link
+              href="https://shopify.dev/docs/apps/getting-started/build-app-example"
+              target="_blank"
+            >
+              example app
+            </s-link>
+          </s-list-item>
+          <s-list-item>
+            Explore Shopify&apos;s API with{" "}
+            <s-link
+              href="https://shopify.dev/docs/apps/tools/graphiql-admin-api"
+              target="_blank"
+            >
+              GraphiQL
+            </s-link>
+          </s-list-item>
+        </s-unordered-list>
+      </s-section>
     </s-page>
   );
 }

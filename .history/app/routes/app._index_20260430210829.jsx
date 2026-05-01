@@ -78,7 +78,7 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
       </form>
 
       {fetcher.data?.products && (
-        <s-section heading="productCreate mutation"  style={{ margin: 1 }}>
+        <s-section heading="productCreate mutation"  style={{ margin-top: 0 }}>
           <s-stack direction="block" gap="base">
             <s-box
               padding="base"

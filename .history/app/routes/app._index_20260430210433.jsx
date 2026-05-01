@@ -78,7 +78,7 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
       </form>
 
       {fetcher.data?.products && (
-        <s-section heading="productCreate mutation"  style={{ margin: 1 }}>
+        <s-section heading="productCreate mutation">
           <s-stack direction="block" gap="base">
             <s-box
               padding="base"
@@ -136,6 +136,28 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
         </s-paragraph>
       </s-section>
 
+      <s-section slot="aside" heading="Next steps">
+        <s-unordered-list>
+          <s-list-item>
+            Build an{" "}
+            <s-link
+              href="https://shopify.dev/docs/apps/getting-started/build-app-example"
+              target="_blank"
+            >
+              example app
+            </s-link>
+          </s-list-item>
+          <s-list-item>
+            Explore Shopify&apos;s API with{" "}
+            <s-link
+              href="https://shopify.dev/docs/apps/tools/graphiql-admin-api"
+              target="_blank"
+            >
+              GraphiQL
+            </s-link>
+          </s-list-item>
+        </s-unordered-list>
+      </s-section>
     </s-page>
   );
 }
