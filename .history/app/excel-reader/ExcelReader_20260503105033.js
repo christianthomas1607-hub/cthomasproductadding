@@ -1,4 +1,4 @@
-import * as XLSX from "@e965/xlsx";
+import * as XLSX from "xlsx";
 
 export async function excelReader(file) {
   // Shopify’s GraphQL API and the xlsx library expect binary data, not a browser File object.

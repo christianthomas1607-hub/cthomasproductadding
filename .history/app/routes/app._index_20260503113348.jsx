@@ -2,6 +2,7 @@ import { useFetcher } from "react-router";
 
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
+import { productCreateAction } from "../models/ProductCreate.server.js";
 import { excelProductCreateAction } from "../models/ExcelProductCreate.server";
 
 export const loader = async ({ request }) => {
@@ -24,7 +25,7 @@ export const action = async ({ request }) => {
     return excelProductCreateAction({ request, formData });
   }
   else {
-    return null;
+    return BULL;
   }
 
 };
