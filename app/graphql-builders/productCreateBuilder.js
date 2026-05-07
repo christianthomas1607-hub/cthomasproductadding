@@ -1,10 +1,11 @@
-export function buildProductCreateMutation({ title, colors, sizes }) {
+export function buildProductCreateMutation({ title, vendor, colors, sizes }) {
   const mutation = `#graphql
     mutation populateProduct($product: ProductCreateInput!) {
       productCreate(product: $product) {
         product {
           id
           title
+          vendor
           status
           options {
             id
@@ -37,6 +38,7 @@ export function buildProductCreateMutation({ title, colors, sizes }) {
   const variables = {
     product: {
       title,
+      vendor,
       productOptions: [
         {
           name: "Color",

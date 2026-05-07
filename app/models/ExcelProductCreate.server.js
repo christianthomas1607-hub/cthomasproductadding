@@ -2,6 +2,7 @@ import { authenticate } from "../shopify.server";
 import { excelReader } from "../excel-reader/ExcelReader";
 import {
   itemNameTransform,
+  vendorTransform,
   colorsTransform,
   sizesTransform,
 } from "../utilities/transformers/Transformer.js";
@@ -34,12 +35,15 @@ export async function excelProductCreateAction({ request, formData }) {
 
     console.log(itemName);
 
+    const vendor = await vendorTransform(row.Vendor);
+
     const colors = await colorsTransform(row.Color);
 
     const sizes = await sizesTransform(row.Sizes);
 
     const { mutation, variables } = buildProductCreateMutation({
       title: itemName,
+      vendor,
       colors,
       sizes,
     });

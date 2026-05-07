@@ -18,6 +18,16 @@ export async function itemNameTransform(nameCell) {
   return nameTransformed;
 }
 
+export async function vendorTransform(vendorCell) {
+  const vendorTransformed = vendorCell
+    .trim()
+    .replace("  ", "")
+    .replace(/\n/g, "") //Removes newline
+    .replace(/[^a-zA-Z0-9 ]/g, "") //This strips punctuation, symbols, emojis—everything except letters and numbers:
+    .toLowerCase();
+  return vendorTransformed;
+}
+
 export async function colorsTransform(colorCell) {
   const colorsArray = colorCell.split(/\r?\n/);
 

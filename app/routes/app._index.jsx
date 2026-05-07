@@ -4,6 +4,12 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { excelProductCreateAction } from "../models/ExcelProductCreate.server";
 
+import {
+  inlineGraphQL,
+  inlineMutation,
+  inlineMutationOptions,
+} from "../utilities/transformers/graphQLTransformer";
+
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
   return null;
@@ -77,23 +83,58 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
       </form>
 
       {fetcher.data?.products?.map((p, i) => (
-        <s-section key={i} heading={`Mutations for ${p.product.title}`}>
+        <s-section heading={`Mutations for ${p.product.title}`} key={i}>
           <h3>Product Create</h3>
           <pre>
-            <code>{p.productCreateMutation}</code>
-          </pre>
-          <pre>
-            <code>{JSON.stringify(p.productCreateVariables, null, 2)}</code>
+            <code>
+              {inlineMutation(
+                p.productCreateMutation,
+                p.productCreateVariables,
+              )}
+            </code>
           </pre>
 
           <h3>Variants Bulk Create</h3>
           <pre>
-            <code>{p.variantsMutation}</code>
-          </pre>
-          <pre>
-            <code>{JSON.stringify(p.variantsVariables, null, 2)}</code>
+            <code>
+              {inlineMutationOptions(p.variantsMutation, p.variantsVariables)}
+            </code>
           </pre>
         </s-section>
+
+        //Separate
+        // <s-section key={i} heading={`Mutations for ${p.product.title}`}>
+        //   <h3>Product Create</h3>
+        //   <pre>
+        //     <code>{p.productCreateMutation}</code>
+        //   </pre>
+        //   <pre>
+        //     <code>{JSON.stringify(p.productCreateVariables, null, 2)}</code>
+        //   </pre>
+
+        //   <h3>Variants Bulk Create</h3>
+        //   <pre>
+        //     <code>{p.variantsMutation}</code>
+        //   </pre>
+        //   <pre>
+        //     <code>{JSON.stringify(p.variantsVariables, null, 2)}</code>
+        //   </pre>
+        // </s-section>
+        // <s-section heading={`Mutations for ${p.product.title}`} key={i}>
+        //   <h3>Product Create</h3>
+        //   <pre>
+        //     <code>
+        //       { inlineGraphQL(p.productCreateMutation, p.productCreateVariables)}
+        //     </code>
+        //   </pre>
+
+        //   <h3>Variants Bulk Create</h3>
+        //   <pre>
+        //     <code>
+        //       {inlineGraphQL(p.variantsMutation, p.variantsVariables)}
+        //     </code>
+        //   </pre>
+        // </s-section>
       ))}
 
       <s-section slot="aside" heading="App template specs">
