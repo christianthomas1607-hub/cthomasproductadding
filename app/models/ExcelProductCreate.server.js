@@ -6,6 +6,11 @@ import {
   sizesTransform,
 } from "../utilities/transformers/Transformer.js";
 
+import {
+  buildProductCreateMutation,
+  buildProductVariantsBulkCreateMutation,
+} from "../graphql-builders/productCreateBuilder.js";
+
 export async function excelProductCreateAction({ request, formData }) {
   const { admin } = await authenticate.admin(request);
 
@@ -29,146 +34,51 @@ export async function excelProductCreateAction({ request, formData }) {
 
     console.log(itemName);
 
-    const colorsTransformedArray = await colorsTransform(row.Color);
+    const colors = await colorsTransform(row.Color);
 
-    const sizesTransformedArray = await sizesTransform(row.Sizes);
+    const sizes = await sizesTransform(row.Sizes);
 
-    const colorsValuesArray = [];
-
-    for (const color of colorsTransformedArray) {
-      colorsValuesArray.push({
-        name: color,
-      });
-    }
-
-    const sizeValuesArray = [];
-
-    for (const size of sizesTransformedArray) {
-      sizeValuesArray.push({
-        name: size,
-      });
-    }
+    const { mutation, variables } = buildProductCreateMutation({
+      title: itemName,
+      colors,
+      sizes,
+    });
     //What they both look like:
     //values: [{ name: "Red" }, { name: "Green" }, { name: "Blue" }],
 
-    const response = await admin.graphql(
-      `#graphql
-      mutation populateProduct($product: ProductCreateInput!) {
-        productCreate(product: $product) {
-           product {
-        id
-        title
-        status
-        options {
-          id
-          name
-          position
-          optionValues {
-            id
-            name
-            hasVariants
-          }
-        }
-
-        variants(first: 240) {
-        edges {
-          node {
-            id
-            title
-            price
-          }
-        }
-      }
-      }
-      userErrors {
-        field
-        message
-      }
-    }
-      }`,
-      {
-        variables: {
-          product: {
-            title: `${itemName}`,
-            productOptions: [
-              {
-                name: "Color",
-                values: colorsValuesArray,
-              },
-              {
-                name: "Size",
-                values: sizeValuesArray,
-              },
-            ],
-          },
-        },
-      },
-    );
+    const response = await admin.graphql(mutation, { variables });
 
     const responseJson = await response.json();
     const product = responseJson.data.productCreate.product;
 
-    const variantsArray = [];
+    // 2️⃣ Build and send productVariantsBulkCreate mutation
+    const {
+      mutation: variantsMutation,
+      variables: variantsVariables,
+      variants,
+    } = buildProductVariantsBulkCreateMutation({
+      productId: product.id,
+      colors,
+      sizes,
+      sku: row.SKU,
+      price: 0.0,
+    });
 
-    for (const color of colorsTransformedArray) {
-      for (const size of sizesTransformedArray) {
-        variantsArray.push({
-          price: 0.0,
-          optionValues: [
-            { optionName: "Color", name: color },
-            { optionName: "Size", name: size },
-          ],
-          inventoryItem: {
-            sku: row.SKU,
-          },
-        });
-      }
-    }
-    //What it looks like:
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Small", optionName: "Size" },
-    //   ],
-    // },
-    // {
-    //   price: 4.99,
-    //   optionValues: [
-    //     { name: "Red", optionName: "Color" },
-    //     { name: "Medium", optionName: "Size" },
-    //   ],
-    // }
-
-    const responseOptions = await admin.graphql(
-      `#graphql
-  mutation ProductVariantsCreate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-    productVariantsBulkCreate(productId: $productId, strategy: REMOVE_STANDALONE_VARIANT, variants: $variants) {
-      productVariants {
-        id
-        title
-        selectedOptions {
-          name
-          value
-        }
-      }
-      userErrors {
-        field
-        message
-      }
-    }
-  }`,
-      {
-        variables: {
-          productId: product.id,
-          variants: variantsArray,
-        },
-      },
-    );
+    const responseOptions = await admin.graphql(variantsMutation, {
+      variables: variantsVariables,
+    });
 
     await responseOptions.json();
 
-    createdProducts.push(responseJson.data.productCreate.product);
+    // 3️⃣ Push everything you want to show in the UI
+    createdProducts.push({
+      product,
+      productCreateMutation: mutation,
+      productCreateVariables: variables,
+      variantsMutation,
+      variantsVariables,
+      variants,
+    });
   }
   return { products: createdProducts };
 }

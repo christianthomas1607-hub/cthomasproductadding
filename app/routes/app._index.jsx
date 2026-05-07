@@ -22,11 +22,9 @@ export const action = async ({ request }) => {
 
   if (file) {
     return excelProductCreateAction({ request, formData });
-  }
-  else {
+  } else {
     return null;
   }
-
 };
 
 export default function Index() {
@@ -78,22 +76,25 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
         <s-button type="submit">Upload Excel & Create Products</s-button>
       </form>
 
-      {fetcher.data?.products && (
-        <s-section heading="productCreate mutation"  style={{ margin: 1 }}>
-          <s-stack direction="block" gap="base">
-            <s-box
-              padding="base"
-              borderWidth="base"
-              borderRadius="base"
-              background="subdued"
-            >
-              <pre style={{ margin: 0 }}>
-                <code>{JSON.stringify(fetcher.data.products, null, 2)}</code>
-              </pre>
-            </s-box>
-          </s-stack>
+      {fetcher.data?.products?.map((p, i) => (
+        <s-section key={i} heading={`Mutations for ${p.product.title}`}>
+          <h3>Product Create</h3>
+          <pre>
+            <code>{p.productCreateMutation}</code>
+          </pre>
+          <pre>
+            <code>{JSON.stringify(p.productCreateVariables, null, 2)}</code>
+          </pre>
+
+          <h3>Variants Bulk Create</h3>
+          <pre>
+            <code>{p.variantsMutation}</code>
+          </pre>
+          <pre>
+            <code>{JSON.stringify(p.variantsVariables, null, 2)}</code>
+          </pre>
         </s-section>
-      )}
+      ))}
 
       <s-section slot="aside" heading="App template specs">
         <s-paragraph>
@@ -136,7 +137,6 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
           </s-link>
         </s-paragraph>
       </s-section>
-
     </s-page>
   );
 }
