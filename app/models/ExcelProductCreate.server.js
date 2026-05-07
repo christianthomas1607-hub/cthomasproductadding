@@ -4,7 +4,7 @@ import {
   itemNameTransform,
   colorsTransform,
   sizesTransform,
-} from "../utilities/transformers/transformer";
+} from "../utilities/transformers/Transformer.js";
 
 export async function excelProductCreateAction({ request, formData }) {
   const { admin } = await authenticate.admin(request);

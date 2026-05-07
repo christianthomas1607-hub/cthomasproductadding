@@ -2,12 +2,25 @@ import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { authenticate } from "../shopify.server";
+import { excelProductCreateAction } from "../models/ExcelProductCreate.server";
 
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
 
   // eslint-disable-next-line no-undef
   return { apiKey: process.env.SHOPIFY_API_KEY || "" };
+};
+
+export const action = async ({ request }) => {
+  await authenticate.admin(request);
+  const formData = await request.formData();
+  const file = formData.get("file");
+
+  if (file) {
+    return excelProductCreateAction({ request, formData });
+  }
+
+  return null;
 };
 
 export default function App() {
