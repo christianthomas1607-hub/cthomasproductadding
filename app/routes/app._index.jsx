@@ -6,8 +6,8 @@ import { excelProductCreateAction } from "../models/ExcelProductCreate.server";
 
 import {
   inlineGraphQL,
-  inlineMutation,
-  inlineMutationOptions,
+  inlineProductCreate,
+  inlineVariantsMutation,
 } from "../utilities/transformers/graphQLTransformer";
 
 export const loader = async ({ request }) => {
@@ -87,7 +87,7 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
           <h3>Product Create</h3>
           <pre>
             <code>
-              {inlineMutation(
+              {inlineProductCreate(
                 p.productCreateMutation,
                 p.productCreateVariables,
               )}
@@ -97,7 +97,7 @@ This keeps App Bridge alive and avoids the “useContext is null” error. */}
           <h3>Variants Bulk Create</h3>
           <pre>
             <code>
-              {inlineMutationOptions(p.variantsMutation, p.variantsVariables)}
+              {inlineVariantsMutation(p.variantsMutation, p.variantsVariables)}
             </code>
           </pre>
         </s-section>
